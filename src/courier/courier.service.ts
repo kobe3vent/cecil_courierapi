@@ -1,8 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {
+  DeleteResult,
+  FindManyOptions,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 import { Courier } from '../db/tables/courier.table';
-import { NewCourier } from './types';
+import { NewCourier, QueryCourier, UpdateCourier } from './types';
+
+const MAX_CAPACITY = 300;
 
 @Injectable()
 export class CourierService {
@@ -11,6 +23,15 @@ export class CourierService {
   ) {}
 
   async createCourier({ max_capacity, id }: NewCourier) {
+    if (max_capacity > MAX_CAPACITY) {
+      throw new BadRequestException(
+        `max_capacity cannot exceed ${MAX_CAPACITY}`,
+      );
+    }
+    const courier = await this.courier_repo.findOneBy({ id });
+    if (courier) {
+      throw new ConflictException(`Duplicate: Courier id ${id} exists`);
+    }
     return await this.courier_repo.save({
       max_capacity,
       available_capacity: max_capacity,
@@ -18,8 +39,45 @@ export class CourierService {
     });
   }
 
-  async findCouriers(): Promise<Courier[]> {
-    const couriers = await this.courier_repo.find({});
+  async findCouriers({ capacity_required }: QueryCourier): Promise<Courier[]> {
+    const query: FindManyOptions<Courier> = {};
+    if (capacity_required) {
+      query.where = {
+        available_capacity: MoreThanOrEqual(capacity_required),
+      };
+    }
+    const couriers = await this.courier_repo.find(query);
     return couriers;
+  }
+
+  async deleteCourier(id: number): Promise<DeleteResult> {
+    return await this.courier_repo.delete({ id });
+  }
+
+  async updateCourier({ remove_item, add_item, id }: UpdateCourier) {
+    const courier = await this.courier_repo.findOneBy({ id });
+    if (!courier) {
+      throw new NotFoundException(`Courier does not exist (id ${id})`);
+    }
+    let avaliable_capacity = courier.available_capacity;
+    if (remove_item) {
+      // available capacity cant exceed max capacity
+      avaliable_capacity = Math.min(
+        avaliable_capacity + remove_item,
+        courier.max_capacity,
+      );
+    }
+    if (add_item) {
+      avaliable_capacity -= add_item;
+    }
+    if (avaliable_capacity < 0) {
+      throw new BadRequestException(
+        `courier capacity exceeded by an excess of ${avaliable_capacity} `,
+      );
+    }
+    return this.courier_repo.save({
+      ...courier,
+      available_capacity: avaliable_capacity,
+    });
   }
 }

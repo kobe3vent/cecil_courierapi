@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { CourierController } from './courier/courier.controller';
 import { CourierService } from './courier/courier.service';
 import { Courier } from './db/tables/courier.table';
@@ -22,7 +20,7 @@ import { Courier } from './db/tables/courier.table';
     }),
     TypeOrmModule.forFeature([Courier]),
   ],
-  controllers: [AppController, CourierController],
-  providers: [AppService, CourierService],
+  controllers: [CourierController],
+  providers: [CourierService],
 })
 export class AppModule {}
