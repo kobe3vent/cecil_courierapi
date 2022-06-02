@@ -19,7 +19,6 @@ export class CourierController {
 
   @Post('/')
   async createCourier(@Body() new_courier_data: NewCourier): Promise<Courier> {
-    console.log('input: ', new_courier_data)
     return this.courier_service.createCourier(new_courier_data);
   }
   @Get('/lookup')
@@ -33,7 +32,8 @@ export class CourierController {
   }
 
   @Delete('/:id')
-  async deleteCourier(@Param() id: number): Promise<DeleteResult> {
+  async deleteCourier(@Param() param: { id: number }): Promise<DeleteResult> {
+    const { id } = param;
     if (isNaN(id)) throw new BadRequestException(`invalid delete input`);
     return this.courier_service.deleteCourier(id);
   }

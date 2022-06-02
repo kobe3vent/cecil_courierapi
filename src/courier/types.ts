@@ -21,11 +21,9 @@ export class CreateNewCourier extends NewCourier {
 
 export class QueryCourier {
   @IsOptional()
-  @IsNumber()
   capacity_required?: number;
 
   @IsOptional()
-  @IsNumber()
   id?: number;
 }
 

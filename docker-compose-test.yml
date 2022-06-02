@@ -1,0 +1,13 @@
+version: '3'
+services:
+  test_database:
+    image: "postgres"
+    restart: always
+    environment:
+      - POSTGRES_PORT=5434
+      - POSTGRES_USER=stuart
+      - POSTGRES_PASSWORD=password  
+      - POSTGRES_DB=stuartTest  
+      - POSTGRES_HOST=localhost
+    ports:
+     - '5434:5432'
