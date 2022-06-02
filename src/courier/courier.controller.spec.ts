@@ -52,7 +52,7 @@ describe('CourierController', () => {
   });
 
   it('should call courierService.DeleteCourier', async () => {
-    controller.deleteCourier(1);
+    controller.deleteCourier({ id: 1 });
     expect(spyService.deleteCourier).toHaveBeenCalledTimes(1);
   });
 });
