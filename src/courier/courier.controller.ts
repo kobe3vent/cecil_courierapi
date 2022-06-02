@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -12,14 +13,14 @@ import { Courier } from 'src/db/tables/courier.table';
 import { DeleteResult } from 'typeorm';
 import { CourierService } from './courier.service';
 import { NewCourier, QueryCourier, UpdateCourier } from './types';
-
 @Controller('couriers')
 export class CourierController {
   constructor(private readonly courier_service: CourierService) {}
 
   @Post('/')
-  async createCourier(@Body() courier_data: NewCourier): Promise<Courier> {
-    return this.courier_service.createCourier(courier_data);
+  async createCourier(@Body() new_courier_data: NewCourier): Promise<Courier> {
+    console.log('input: ', new_courier_data)
+    return this.courier_service.createCourier(new_courier_data);
   }
   @Get('/lookup')
   async findCouriers(@Query() query?: QueryCourier): Promise<Courier[]> {
@@ -33,6 +34,7 @@ export class CourierController {
 
   @Delete('/:id')
   async deleteCourier(@Param() id: number): Promise<DeleteResult> {
+    if (isNaN(id)) throw new BadRequestException(`invalid delete input`);
     return this.courier_service.deleteCourier(id);
   }
 }

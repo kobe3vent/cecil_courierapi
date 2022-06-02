@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { validateOrReject } from 'class-validator';
 import {
   DeleteResult,
   FindManyOptions,
@@ -12,7 +13,14 @@ import {
   Repository,
 } from 'typeorm';
 import { Courier } from '../db/tables/courier.table';
-import { NewCourier, QueryCourier, UpdateCourier } from './types';
+import {
+  CreateNewCourier,
+  CreateQueryCourier,
+  CreateUpdateCourier,
+  NewCourier,
+  QueryCourier,
+  UpdateCourier,
+} from './types';
 
 const MAX_CAPACITY = 300;
 
@@ -23,6 +31,12 @@ export class CourierService {
   ) {}
 
   async createCourier({ max_capacity, id }: NewCourier) {
+    const input = new CreateNewCourier({ max_capacity, id });
+    try {
+      await validateOrReject(input);
+    } catch (errors) {
+      throw new BadRequestException(`invalid request input ${errors}`);
+    }
     if (max_capacity > MAX_CAPACITY) {
       throw new BadRequestException(
         `max_capacity cannot exceed ${MAX_CAPACITY}`,
@@ -40,6 +54,13 @@ export class CourierService {
   }
 
   async findCouriers({ capacity_required }: QueryCourier): Promise<Courier[]> {
+    const validateQuery = new CreateQueryCourier({ capacity_required });
+    try {
+      await validateOrReject(validateQuery);
+    } catch (errors) {
+      throw new BadRequestException(`invalid look up request input ${errors}`);
+    }
+
     const query: FindManyOptions<Courier> = {};
     if (capacity_required) {
       query.where = {
@@ -55,6 +76,17 @@ export class CourierService {
   }
 
   async updateCourier({ remove_item, add_item, id }: UpdateCourier) {
+    const validateUpdateData = new CreateUpdateCourier({
+      remove_item,
+      add_item,
+      id,
+    });
+    try {
+      await validateOrReject(validateUpdateData);
+    } catch (errors) {
+      throw new BadRequestException(`invalid update request input ${errors}`);
+    }
+
     const courier = await this.courier_repo.findOneBy({ id });
     if (!courier) {
       throw new NotFoundException(`Courier does not exist (id ${id})`);

@@ -10,6 +10,15 @@ export class NewCourier {
   id: number;
 }
 
+export class CreateNewCourier extends NewCourier {
+  constructor(readonly courier: NewCourier) {
+    super();
+    this.id = courier.id;
+    this.max_capacity = courier.max_capacity;
+    return this;
+  }
+}
+
 export class QueryCourier {
   @IsOptional()
   @IsNumber()
@@ -20,18 +29,37 @@ export class QueryCourier {
   id?: number;
 }
 
+export class CreateQueryCourier extends QueryCourier {
+  constructor(readonly query: QueryCourier) {
+    super();
+    this.id = query?.id;
+    this.capacity_required = query?.capacity_required;
+    return this;
+  }
+}
+
 export class UpdateCourier {
   @IsOptional()
   @IsNotEmpty()
   @IsNumber()
-  readonly remove_item?: number;
+  remove_item?: number;
 
   @IsOptional()
   @IsNotEmpty()
   @IsNumber()
-  readonly add_item?: number;
+  add_item?: number;
 
   @IsNotEmpty()
   @IsNumber()
-  readonly id: number;
+  id: number;
+}
+
+export class CreateUpdateCourier extends UpdateCourier {
+  constructor(readonly updateParams: UpdateCourier) {
+    super();
+    this.id = updateParams.id;
+    this.add_item = updateParams?.add_item;
+    this.remove_item = updateParams?.remove_item;
+    return this;
+  }
 }

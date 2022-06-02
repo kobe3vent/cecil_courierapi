@@ -31,16 +31,17 @@ describe('CourierController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should call courierService.findCouriers with right parameters', async () => {
+  it('should call courierService.createCourier', async () => {
+    const newCourier = { id: 1, max_capacity: 75 };
+    controller.createCourier(newCourier);
+    expect(spyService.createCourier).toHaveBeenCalledWith(newCourier);
+    expect(spyService.createCourier).toHaveBeenCalledTimes(1);
+  });
+
+  it('should call courierService.findCouriers', async () => {
     const capacity_required = 30;
     controller.findCouriers({ capacity_required });
     expect(spyService.findCouriers).toHaveBeenCalledWith({ capacity_required });
-  });
-
-  it('should call courierService.createCourier', async () => {
-    const newCourier = { id: 1, max_capacity: 75 };
-    expect(spyService.createCourier).toHaveBeenCalledWith(newCourier);
-    expect(spyService.createCourier).toHaveBeenCalledTimes(1);
   });
 
   it('should call courierService.updateCourier', async () => {
