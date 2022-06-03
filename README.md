@@ -40,6 +40,44 @@ If you were to have more time, what would you do? Briefly explain what could be 
     - introduce logging
 
 
+
+## Endpoints
+
+    #Create new Courier
+    POST http://localhost:3000/couriers 
+        {
+            "id": <number>, //mandatory
+            "max_capacity": <(number < 300) > //mandatory
+        }'
+
+    #Look up Courier by id or by capacity_required 
+    (techically you can query both at the same time.)
+
+    GET http://localhost:3000/couriers/lookup?capacity_required=<number> 
+
+    GET http://localhost:3000/couriers/lookup?id=<number>     
+
+    This gets you all couriers available
+    GET http://localhost:3000/couriers/lookup
+
+
+    # BONUS GOAL 1: allowing courier capacity to be updated on the go.
+    PUT http://localhost:3000/couriers
+
+        {
+            remove_item: <number>, //optional
+            add_item: <number>,  //optional
+            id: <number> // mandatory
+        }
+
+    # Removing courier
+    DELETE http://localhost:3000/couriers/<id>
+
+        id: number
+
+
+
+
 ## Installation
 
 ```bash

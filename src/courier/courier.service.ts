@@ -53,7 +53,10 @@ export class CourierService {
     });
   }
 
-  async findCouriers({ capacity_required }: QueryCourier): Promise<Courier[]> {
+  async findCouriers({
+    id,
+    capacity_required,
+  }: QueryCourier): Promise<Courier[]> {
     const validateQuery = new CreateQueryCourier({ capacity_required });
     try {
       await validateOrReject(validateQuery);
@@ -66,6 +69,9 @@ export class CourierService {
       query.where = {
         available_capacity: MoreThanOrEqual(capacity_required),
       };
+    }
+    if (id) {
+      query.where = { ...query.where, id };
     }
     const couriers = await this.courier_repo.find(query);
     return couriers;
@@ -89,8 +95,12 @@ export class CourierService {
 
     const courier = await this.courier_repo.findOneBy({ id });
     if (!courier) {
-      throw new NotFoundException(`Courier does not exist (id ${id})`);
+      throw new NotFoundException(`Courier with id (${id}) does not exist`);
     }
+
+    // if no relevant action, return courier;
+    if (!remove_item && !add_item) return courier;
+
     let avaliable_capacity = courier.available_capacity;
     if (remove_item) {
       // available capacity cant exceed max capacity
@@ -99,9 +109,13 @@ export class CourierService {
         courier.max_capacity,
       );
     }
+
+    // TODO: should we allow both possible actions in one transaction??
+    // if not, then this should be else if
     if (add_item) {
       avaliable_capacity -= add_item;
     }
+
     if (avaliable_capacity < 0) {
       throw new BadRequestException(
         `courier capacity exceeded by an excess of ${avaliable_capacity} `,

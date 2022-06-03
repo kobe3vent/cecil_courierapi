@@ -26,7 +26,7 @@ export class CourierController {
     return this.courier_service.findCouriers(query);
   }
 
-  @Put('/') // BONUS GOAL 1: allowing courier capacity to be updated on the go.
+  @Put('/')
   async updateCourier(@Body() update_data: UpdateCourier): Promise<Courier> {
     return this.courier_service.updateCourier(update_data);
   }
