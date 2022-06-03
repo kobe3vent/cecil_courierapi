@@ -12,7 +12,7 @@ import {
 import { Courier } from 'src/db/tables/courier.table';
 import { DeleteResult } from 'typeorm';
 import { CourierService } from './courier.service';
-import { NewCourier, QueryCourier, UpdateCourier } from './types';
+import { NewCourier, QueryCourier, UpdateCourier } from './courier.types';
 @Controller('couriers')
 export class CourierController {
   constructor(private readonly courier_service: CourierService) {}

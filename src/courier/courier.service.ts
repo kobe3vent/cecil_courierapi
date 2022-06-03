@@ -20,7 +20,7 @@ import {
   NewCourier,
   QueryCourier,
   UpdateCourier,
-} from './types';
+} from './courier.types';
 
 const MAX_CAPACITY = 300;
 
